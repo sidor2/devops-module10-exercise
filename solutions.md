@@ -9,16 +9,13 @@
 **Minikube**
 
 ```sh
-minikube start --driver=hyperkit
-
-# install hyperkit if not already installed
-# optionally you can use another driver, like Docker
-
+minikube start
 ```
 
 **LKE**
 ```sh
 On Linode UI dashboard, create K8s cluster with 2 smallest nodes "Dedicated 4 GB" plan
+Update your KUBECONFIG context to connect to Linode environment
 ```
 
 </details>
@@ -26,14 +23,14 @@ On Linode UI dashboard, create K8s cluster with 2 smallest nodes "Dedicated 4 GB
 ******
 
 <details>
-<summary>Exercise 2: Deploy Mysql with 3 replicas </summary>
+<summary>Exercise 2: Deploy Mysql with 2 replicas </summary>
  <br />
 
 **General notes**
 - All the k8s manifest files for the exercise are in "k8s-deployment" folder, so:
 ```sh
 # clone this repository locally
-git clone git@gitlab.com:devops-bootcamp3/bootcamp-java-mysql.git
+git clone https://gitlab.com/twn-devops-bootcamp/latest/10-kubernetes/kubernetes-exercises.git
 
 # check out the solutions branch
 git checkout feature/solutions
@@ -59,20 +56,12 @@ helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install my-release bitnami/mysql -f mysql-chart-values-lke.yaml
 
 ```
-
-**Note**
-```sh
-If you get an error, that your application cant access database, then use the version 8.8.6 of mysql chart, using --version 8.8.6 flag at the end of helm install command
-helm install ... --version 8.8.6
-# Reason is that Mysql Chart version 8.8.8+ has a bug setting the db user password incorrectly: https://giters.com/bitnami/charts/issues/8557, and causes the connection to database to fail. 
-```
-
 </details>
 
 ******
 
 <details>
-<summary>Exercise 3: Deploy your Java Application with 3 replicas </summary>
+<summary>Exercise 3: Deploy your Java Application with 2 replicas </summary>
  <br />
 
 **Minikube & LKE**
@@ -136,11 +125,6 @@ helm install ingress-nginx ingress-nginx/ingress-nginx
 
 **Notes on installing Ingress-controller on LKE**
 - Chart link: https://github.com/kubernetes/ingress-nginx/tree/main/charts/ingress-nginx
-- Known issue when pulling ingress-nginx images from k8s repository:
-https://www.reddit.com/r/kubernetes/comments/rorzhd/nginx_ingress_unable_to_pull_official_images/
-
-As a workaround, try a different region or just use Minikube
-
 </details>
 
 ******
@@ -151,14 +135,14 @@ As a workaround, try a different region or just use Minikube
 
 **Minikube**
 
-- set the host name in java-app-ingress.yaml line 6 to my-java-app.com
-- get minikube ip address with command `minikube ip`, example: 192.168.64.27
-- add `192.168.64.27 my-java-app.com` in /etc/hosts file
+- set the host name in java-app-ingress.yaml line 7 to my-java-app.com
+- add `127.0.0.1 my-java-app.com` in /etc/hosts file
 - create ingress component: `kubectl apply -f java-app-ingress.yaml`
+- run `minikube tunnel` command in terminal window
 - access application from browser on address: `my-java-app.com`
 
 **LKE**
-- set the host name in java-app-ingress.yaml line 6 to Linode node-balancer address
+- set the host name in java-app-ingress.yaml line 7 to Linode node-balancer address
 - create ingress component: `kubectl apply -f java-app-ingress.yaml`
 - access application from browser on Linode node-balancer address
 
@@ -205,11 +189,11 @@ kubectl port-forward svc/phpmyadmin-service 8081:8081
 
 - validate that your chart is correct and debug any issues, do a dry-run
 
-`helm install my-cool-java-app java-app -f java-app/values-deploy.yaml --dry-run --debug`
+`helm install my-cool-java-app java-app -f java-app/values-override.yaml --dry-run --debug`
 
 - if dry-run shows the k8s manifest files with correct values, everything is working, so you can create the chart release
 
-`helm install my-cool-java-app java-app -f java-app/values-deploy.yaml` 
+`helm install my-cool-java-app java-app -f java-app/values-override.yaml` 
 
 - extract the chart `java-app` folder and host into its own new git repository `java-app-chart` 
 
