@@ -2,3 +2,5 @@
 build
 out
 .gradle*
+/module10-kubeconfig.yaml
+/k8s/mysql-chart-values-lke.yaml
